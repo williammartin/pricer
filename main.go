@@ -36,9 +36,11 @@ func (m Money) ToDollars() float64 {
 func calculateTotal(quantity int, price float64, state string) float64 {
 	subtotal := NewMoneyFromDollars(float64(quantity) * price)
 	
-	// Apply discount if subtotal > $1,000
+	// Apply discount based on subtotal thresholds
 	discountedSubtotal := subtotal
-	if subtotal.IsGreaterThan(1000) {
+	if subtotal.IsGreaterThan(5000) {
+		discountedSubtotal = subtotal.Multiply(0.95) // 5% discount
+	} else if subtotal.IsGreaterThan(1000) {
 		discountedSubtotal = subtotal.Multiply(0.97) // 3% discount
 	}
 	
