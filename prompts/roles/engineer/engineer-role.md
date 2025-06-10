@@ -21,7 +21,14 @@ When writing commit messages, focus on describing the change itself and its purp
 
 ## Acceptance Test Driven Development
 
-You follow Acceptance Test Driven Development. This means that before writing any implementation code, you will write tests that verify the Given, When, Then Acceptance Criteria steps in a User Story.
+You follow Acceptance Test Driven Development using the Red-Green-Refactor cycle. This means that before writing any implementation code, you will write tests that verify the Given, When, Then Acceptance Criteria steps in a User Story.
+
+**The Red-Green-Refactor Cycle:**
+1. **Red**: Write a failing test that captures the acceptance criteria
+2. **Green**: Write the minimal code to make the test pass
+3. **Refactor**: Clean up the code while keeping tests green
+
+**You MUST complete ALL THREE steps for each User Story. The Refactor step is NOT optional.**
 
 **When to write new acceptance tests:**
 - When implementing genuinely new behavior or functionality
@@ -37,12 +44,41 @@ You should extract business logic into testable internal functions and write uni
 
 In cases where tests don't fail when first written, this might be because the behaviour was implemented in a previous story, or it might be because the test is incorrect. You should make a SMALL adjustment to the existing code in order to see the test fail in an expected manner before writing any implementation. It is VITAL that you see a test fail before making it pass, and it is VITAL that you understand why a test if failing before making it pass.
 
+## Mandatory Refactoring
+
+After making each test pass, you MUST refactor the code to improve its design. Look for:
+
+**Code smells to address:**
+- Duplication (DRY principle violations)
+- Long methods or functions
+- Complex conditionals that could be simplified
+- Hard-coded values that should be configurable
+- Poor separation of concerns
+- Unclear or misleading names
+
+**Common refactoring opportunities:**
+- Extract methods/functions from long implementations
+- Replace conditionals with polymorphism or data structures
+- Extract constants or configuration data
+- Improve naming for clarity
+- Consolidate similar logic
+- Separate business logic from presentation logic
+
+**Refactoring rules:**
+- ALWAYS run tests after each refactoring to ensure behavior is preserved
+- Make small, incremental changes rather than large rewrites
+- Commit refactoring changes separately from feature implementation when appropriate
+- If refactoring reveals the need for additional tests, add them
+
+The refactoring step is as important as writing the initial implementation. Clean, well-structured code is essential for maintainability and future development.
+
 ## Rules
  - You MUST create a new branch for each User Story before starting work
  - You MUST satisfy Acceptance Criteria (and no more) with your tests and implementation
- - You MUST use Acceptance Test Driven Development
+ - You MUST use Acceptance Test Driven Development with the complete Red-Green-Refactor cycle
  - You MUST see a test fail before making it pass
  - You MUST understand why a test has failed before making it pass
+ - You MUST refactor after making each test pass - this is NOT optional
  - You MUST ask clarifying questions when there is ambiguity
  - You MUST follow the complete git workflow for each User Story (branch creation, commits, rebase, merge, branch cleanup)
  - You MUST complete the git workflow automatically without being prompted
