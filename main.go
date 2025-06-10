@@ -37,6 +37,14 @@ func calculateTotal(quantity int, price float64, state string) float64 {
 	return calculateTotalDetailed(quantity, price, state, false)
 }
 
+var taxRates = map[string]float64{
+	"UT": 0.0685, // Utah: 6.85%
+	"TX": 0.0625, // Texas: 6.25%
+	"CA": 0.0825, // California: 8.25%
+	"NV": 0.08,   // Nevada: 8.00%
+	"AL": 0.04,   // Alabama: 4.00%
+}
+
 func calculateTotalDetailed(quantity int, price float64, state string, verbose bool) float64 {
 	subtotal := NewMoneyFromDollars(float64(quantity) * price)
 	
@@ -60,27 +68,10 @@ func calculateTotalDetailed(quantity int, price float64, state string, verbose b
 		discountRate = 0.03
 	}
 	
-	var taxRate float64
+	// Apply tax if state is supported
+	taxRate, hasTax := taxRates[state]
 	var total Money
-	
-	if state == "UT" {
-		taxRate = 0.0685
-		tax := discountedSubtotal.Multiply(taxRate)
-		total = discountedSubtotal.Add(tax)
-	} else if state == "TX" {
-		taxRate = 0.0625
-		tax := discountedSubtotal.Multiply(taxRate)
-		total = discountedSubtotal.Add(tax)
-	} else if state == "CA" {
-		taxRate = 0.0825
-		tax := discountedSubtotal.Multiply(taxRate)
-		total = discountedSubtotal.Add(tax)
-	} else if state == "NV" {
-		taxRate = 0.08
-		tax := discountedSubtotal.Multiply(taxRate)
-		total = discountedSubtotal.Add(tax)
-	} else if state == "AL" {
-		taxRate = 0.04
+	if hasTax {
 		tax := discountedSubtotal.Multiply(taxRate)
 		total = discountedSubtotal.Add(tax)
 	} else {
@@ -94,7 +85,7 @@ func calculateTotalDetailed(quantity int, price float64, state string, verbose b
 			fmt.Printf("Discount (%.0f%%): -$%.2f\n", discountRate*100, discount.ToDollars())
 			fmt.Printf("After discount: $%.2f\n", discountedSubtotal.ToDollars())
 		}
-		if taxRate > 0 {
+		if hasTax {
 			tax := discountedSubtotal.Multiply(taxRate)
 			fmt.Printf("Tax (%.2f%%): $%.2f\n", taxRate*100, tax.ToDollars())
 		}
@@ -145,15 +136,7 @@ func run(args []string) int {
 	}
 
 	state := args[2]
-	supportedStates := []string{"UT", "TX", "CA", "NV", "AL"}
-	isSupported := false
-	for _, s := range supportedStates {
-		if state == s {
-			isSupported = true
-			break
-		}
-	}
-	if !isSupported {
+	if _, isSupported := taxRates[state]; !isSupported {
 		fmt.Fprintf(os.Stderr, "State code not supported. Supported states: UT, NV, TX, AL, CA\n")
 		return 1
 	}
