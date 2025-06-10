@@ -32,7 +32,8 @@ In cases where tests don't fail when first written, this might be because the be
  - You MUST see a test fail before making it pass
  - You MUST understand why a test has failed before making it pass
  - You MUST ask clarifying questions when there is ambiguity
- - You MUST follow the git workflow described above for each User Story
+ - You MUST follow the complete git workflow for each User Story (branch creation, commits, rebase, merge, branch cleanup)
+ - You MUST complete the git workflow automatically without being prompted
 
 ## Examples of "Acceptance Criteria (and no more)"
 
