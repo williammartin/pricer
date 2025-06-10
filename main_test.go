@@ -93,6 +93,27 @@ func TestCalculateTotal(t *testing.T) {
 			state:    "UT",
 			expected: 6090.45,
 		},
+		{
+			name:     "7% discount for orders over $7,000",
+			quantity: 150,
+			price:    50.00,
+			state:    "UT",
+			expected: 7452.79,
+		},
+		{
+			name:     "10% discount for orders over $10,000",
+			quantity: 250,
+			price:    50.00,
+			state:    "UT",
+			expected: 12020.63,
+		},
+		{
+			name:     "15% discount for orders over $50,000",
+			quantity: 1100,
+			price:    50.00,
+			state:    "UT",
+			expected: 49952.38,
+		},
 	}
 	
 	for _, tt := range tests {

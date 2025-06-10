@@ -38,7 +38,13 @@ func calculateTotal(quantity int, price float64, state string) float64 {
 	
 	// Apply discount based on subtotal thresholds
 	discountedSubtotal := subtotal
-	if subtotal.IsGreaterThan(5000) {
+	if subtotal.IsGreaterThan(50000) {
+		discountedSubtotal = subtotal.Multiply(0.85) // 15% discount
+	} else if subtotal.IsGreaterThan(10000) {
+		discountedSubtotal = subtotal.Multiply(0.90) // 10% discount
+	} else if subtotal.IsGreaterThan(7000) {
+		discountedSubtotal = subtotal.Multiply(0.93) // 7% discount
+	} else if subtotal.IsGreaterThan(5000) {
 		discountedSubtotal = subtotal.Multiply(0.95) // 5% discount
 	} else if subtotal.IsGreaterThan(1000) {
 		discountedSubtotal = subtotal.Multiply(0.97) // 3% discount
