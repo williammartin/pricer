@@ -12,7 +12,7 @@ This introduces the next discount tier, allowing users with larger orders to see
 
 Given I have an order with 120 items at $50 each in Utah (subtotal = $6,000, qualifies for 5% discount)
 When I run `pricer 120 50.00 UT`
-Then I see the output `6087.75`
+Then I see the output `6090.45`
 
 **Calculation breakdown for verification:**
 - Subtotal: 120 × $50.00 = $6,000.00
