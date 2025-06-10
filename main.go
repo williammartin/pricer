@@ -34,52 +34,133 @@ func (m Money) ToDollars() float64 {
 }
 
 func calculateTotal(quantity int, price float64, state string) float64 {
+	return calculateTotalDetailed(quantity, price, state, false)
+}
+
+func calculateTotalDetailed(quantity int, price float64, state string, verbose bool) float64 {
 	subtotal := NewMoneyFromDollars(float64(quantity) * price)
 	
 	// Apply discount based on subtotal thresholds
 	discountedSubtotal := subtotal
+	discountRate := 0.0
 	if subtotal.IsGreaterThan(50000) {
 		discountedSubtotal = subtotal.Multiply(0.85) // 15% discount
+		discountRate = 0.15
 	} else if subtotal.IsGreaterThan(10000) {
 		discountedSubtotal = subtotal.Multiply(0.90) // 10% discount
+		discountRate = 0.10
 	} else if subtotal.IsGreaterThan(7000) {
 		discountedSubtotal = subtotal.Multiply(0.93) // 7% discount
+		discountRate = 0.07
 	} else if subtotal.IsGreaterThan(5000) {
 		discountedSubtotal = subtotal.Multiply(0.95) // 5% discount
+		discountRate = 0.05
 	} else if subtotal.IsGreaterThan(1000) {
 		discountedSubtotal = subtotal.Multiply(0.97) // 3% discount
+		discountRate = 0.03
 	}
+	
+	var taxRate float64
+	var total Money
 	
 	if state == "UT" {
-		tax := discountedSubtotal.Multiply(0.0685)
-		total := discountedSubtotal.Add(tax)
-		return total.ToDollars()
+		taxRate = 0.0685
+		tax := discountedSubtotal.Multiply(taxRate)
+		total = discountedSubtotal.Add(tax)
 	} else if state == "TX" {
-		tax := discountedSubtotal.Multiply(0.0625)
-		total := discountedSubtotal.Add(tax)
-		return total.ToDollars()
+		taxRate = 0.0625
+		tax := discountedSubtotal.Multiply(taxRate)
+		total = discountedSubtotal.Add(tax)
 	} else if state == "CA" {
-		tax := discountedSubtotal.Multiply(0.0825)
-		total := discountedSubtotal.Add(tax)
-		return total.ToDollars()
+		taxRate = 0.0825
+		tax := discountedSubtotal.Multiply(taxRate)
+		total = discountedSubtotal.Add(tax)
 	} else if state == "NV" {
-		tax := discountedSubtotal.Multiply(0.08)
-		total := discountedSubtotal.Add(tax)
-		return total.ToDollars()
+		taxRate = 0.08
+		tax := discountedSubtotal.Multiply(taxRate)
+		total = discountedSubtotal.Add(tax)
 	} else if state == "AL" {
-		tax := discountedSubtotal.Multiply(0.04)
-		total := discountedSubtotal.Add(tax)
+		taxRate = 0.04
+		tax := discountedSubtotal.Multiply(taxRate)
+		total = discountedSubtotal.Add(tax)
+	} else {
+		total = discountedSubtotal
+	}
+	
+	if verbose {
+		fmt.Printf("Subtotal: $%.2f\n", subtotal.ToDollars())
+		if discountRate > 0 {
+			discount := subtotal.Multiply(discountRate)
+			fmt.Printf("Discount (%.0f%%): -$%.2f\n", discountRate*100, discount.ToDollars())
+			fmt.Printf("After discount: $%.2f\n", discountedSubtotal.ToDollars())
+		}
+		if taxRate > 0 {
+			tax := discountedSubtotal.Multiply(taxRate)
+			fmt.Printf("Tax (%.2f%%): $%.2f\n", taxRate*100, tax.ToDollars())
+		}
+		fmt.Printf("Total: $%.2f\n", total.ToDollars())
 		return total.ToDollars()
 	}
 	
-	return discountedSubtotal.ToDollars()
+	return total.ToDollars()
 }
 
 func main() {
-	quantity, _ := strconv.Atoi(os.Args[1])
-	price, _ := strconv.ParseFloat(os.Args[2], 64)
-	state := os.Args[3]
+	verbose := false
+	args := os.Args[1:]
 	
-	total := calculateTotal(quantity, price, state)
-	fmt.Printf("%.2f\n", total)
+	// Check for --verbose flag
+	for i, arg := range args {
+		if arg == "--verbose" {
+			verbose = true
+			args = append(args[:i], args[i+1:]...)
+			break
+		}
+	}
+	
+	if len(args) != 3 {
+		fmt.Fprintf(os.Stderr, "Usage: pricer <quantity> <price> <state> [--verbose]\n")
+		os.Exit(1)
+	}
+
+	quantity, err := strconv.Atoi(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Quantity must be a number\n")
+		os.Exit(1)
+	}
+	
+	if quantity < 0 {
+		fmt.Fprintf(os.Stderr, "Quantity cannot be negative\n")
+		os.Exit(1)
+	}
+
+	price, err := strconv.ParseFloat(args[1], 64)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Price must be a number\n")
+		os.Exit(1)
+	}
+	
+	if price < 0 {
+		fmt.Fprintf(os.Stderr, "Price cannot be negative\n")
+		os.Exit(1)
+	}
+
+	state := args[2]
+	supportedStates := []string{"UT", "TX", "CA", "NV", "AL"}
+	isSupported := false
+	for _, s := range supportedStates {
+		if state == s {
+			isSupported = true
+			break
+		}
+	}
+	if !isSupported {
+		fmt.Fprintf(os.Stderr, "State code not supported. Supported states: UT, NV, TX, AL, CA\n")
+		os.Exit(1)
+	}
+	
+	total := calculateTotalDetailed(quantity, price, state, verbose)
+	if !verbose {
+		fmt.Printf("%.2f\n", total)
+	}
 }
