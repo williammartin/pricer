@@ -5,7 +5,8 @@
       "Bash(go test:*)",
       "Bash(git add:*)",
       "Bash(git branch:*)",
-      "Bash(git rebase:*)"
+      "Bash(git rebase:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
