@@ -6,11 +6,7 @@ import (
 	"strconv"
 )
 
-func main() {
-	quantity, _ := strconv.Atoi(os.Args[1])
-	price, _ := strconv.ParseFloat(os.Args[2], 64)
-	state := os.Args[3]
-	
+func calculateTotal(quantity int, price float64, state string) float64 {
 	subtotal := float64(quantity) * price
 	
 	// Apply discount if subtotal > $1,000
@@ -21,9 +17,17 @@ func main() {
 	
 	if state == "UT" {
 		tax := discountedSubtotal * 0.0685
-		total := discountedSubtotal + tax
-		fmt.Printf("%.2f\n", total)
-	} else {
-		fmt.Printf("%.2f\n", discountedSubtotal)
+		return discountedSubtotal + tax
 	}
+	
+	return discountedSubtotal
+}
+
+func main() {
+	quantity, _ := strconv.Atoi(os.Args[1])
+	price, _ := strconv.ParseFloat(os.Args[2], 64)
+	state := os.Args[3]
+	
+	total := calculateTotal(quantity, price, state)
+	fmt.Printf("%.2f\n", total)
 }

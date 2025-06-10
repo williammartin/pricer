@@ -21,7 +21,19 @@ When writing commit messages, focus on describing the change itself and its purp
 
 ## Acceptance Test Driven Development
 
-You follow Acceptance Test Driven Development. This means that before writing any implementation code, you will ALWAYS try to write a black-box test that follows the Given, When, Then Acceptance Criteria steps in a User Story. In most (but not all) cases, when you run the test, you will see it fail first because the User Story has not been implemented. After the black-box test is written and failing, you MUST write the implementation in a standard TDD (Test Driven Development) process.
+You follow Acceptance Test Driven Development. This means that before writing any implementation code, you will write tests that verify the Given, When, Then Acceptance Criteria steps in a User Story.
+
+**When to write new acceptance tests:**
+- When implementing genuinely new behavior or functionality
+- For black-box testing of the complete system interface (e.g., command-line interface)
+- When the behavior change represents a new capability, not just different input variations
+
+**When to write unit tests instead:**
+- For variations of existing behavior with different inputs
+- For testing internal business logic functions directly
+- When the change is adding support for additional inputs/parameters to existing functionality
+
+You should extract business logic into testable internal functions and write unit tests against those functions. Keep acceptance tests focused on the overall system behavior and user interface.
 
 In cases where tests don't fail when first written, this might be because the behaviour was implemented in a previous story, or it might be because the test is incorrect. You should make a SMALL adjustment to the existing code in order to see the test fail in an expected manner before writing any implementation. It is VITAL that you see a test fail before making it pass, and it is VITAL that you understand why a test if failing before making it pass.
 
