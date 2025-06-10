@@ -13,11 +13,17 @@ func main() {
 	
 	subtotal := float64(quantity) * price
 	
+	// Apply discount if subtotal > $1,000
+	discountedSubtotal := subtotal
+	if subtotal > 1000 {
+		discountedSubtotal = subtotal * 0.97 // 3% discount
+	}
+	
 	if state == "UT" {
-		tax := subtotal * 0.0685
-		total := subtotal + tax
+		tax := discountedSubtotal * 0.0685
+		total := discountedSubtotal + tax
 		fmt.Printf("%.2f\n", total)
 	} else {
-		fmt.Printf("%.2f\n", subtotal)
+		fmt.Printf("%.2f\n", discountedSubtotal)
 	}
 }

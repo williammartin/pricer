@@ -65,3 +65,23 @@ func TestUtahTaxCalculation(t *testing.T) {
 		t.Errorf("Expected '%s', got '%s'", expected, result)
 	}
 }
+
+func TestBasicDiscountOver1000(t *testing.T) {
+	// Given I have an order with 25 items at $50 each in Utah (subtotal = $1,250)
+	// When I run `pricer 25 50.00 UT`
+	// Then I see the output `1295.56`
+	
+	cmd := exec.Command("go", "run", "main.go", "25", "50.00", "UT")
+	output, err := cmd.Output()
+	
+	if err != nil {
+		t.Fatalf("Command failed: %v", err)
+	}
+	
+	result := strings.TrimSpace(string(output))
+	expected := "1295.56"
+	
+	if result != expected {
+		t.Errorf("Expected '%s', got '%s'", expected, result)
+	}
+}
