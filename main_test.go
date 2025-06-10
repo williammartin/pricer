@@ -65,6 +65,13 @@ func TestCalculateTotal(t *testing.T) {
 			state:    "CA",
 			expected: 1212.50,
 		},
+		{
+			name:     "Texas tax calculation with discount",
+			quantity: 25,
+			price:    50.00,
+			state:    "TX",
+			expected: 1288.28,
+		},
 	}
 	
 	for _, tt := range tests {

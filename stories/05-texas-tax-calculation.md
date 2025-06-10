@@ -12,11 +12,11 @@ This expands tax calculation support to a second state, allowing users to test t
 
 Given I have an order with 25 items at $50 each in Texas (subtotal = $1,250, qualifies for 3% discount)
 When I run `pricer 25 50.00 TX`
-Then I see the output `1288.31`
+Then I see the output `1288.28`
 
 **Calculation breakdown for verification:**
 - Subtotal: 25 × $50.00 = $1,250.00
 - Discount: $1,250.00 × 3% = $37.50
 - After discount: $1,250.00 - $37.50 = $1,212.50
-- Tax: $1,212.50 × 6.25% = $75.78
-- Total: $1,212.50 + $75.78 = $1,288.28
+- Tax: $1,212.50 × 6.25% = $75.78125 (rounds to $75.78)
+- Total: $1,212.50 + $75.78125 = $1,288.28125 (rounds to $1,288.28)
