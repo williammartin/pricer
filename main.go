@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"os"
 	"strconv"
 )
@@ -13,11 +12,13 @@ type Money struct {
 }
 
 func NewMoneyFromDollars(dollars float64) Money {
-	return Money{fractionalCents: int64(dollars * 10000 + 0.5)}
+	// Convert to fractional cents, rounding to nearest
+	return Money{fractionalCents: int64(dollars*10000 + 0.5)}
 }
 
-func (m Money) Multiply(factor float64) Money {
-	return Money{fractionalCents: int64(float64(m.fractionalCents) * factor + 0.5)}
+func (m Money) MultiplyByRate(numerator, denominator int64) Money {
+	// Multiply by fraction, rounding to nearest fractional cent
+	return Money{fractionalCents: (m.fractionalCents*numerator + denominator/2) / denominator}
 }
 
 func (m Money) Add(other Money) Money {
@@ -25,12 +26,13 @@ func (m Money) Add(other Money) Money {
 }
 
 func (m Money) IsGreaterThan(dollars float64) bool {
-	return m.fractionalCents > int64(dollars * 10000)
+	return m.fractionalCents > int64(dollars*10000)
 }
 
 func (m Money) ToDollars() float64 {
-	// Round to nearest cent
-	return math.Round(float64(m.fractionalCents)/100) / 100
+	// Round to nearest cent using integer arithmetic
+	cents := (m.fractionalCents + 50) / 100 // Add 50 for rounding
+	return float64(cents) / 100
 }
 
 func calculateTotal(quantity int, price float64, state string) float64 {
@@ -52,19 +54,19 @@ func calculateTotalDetailed(quantity int, price float64, state string, verbose b
 	discountedSubtotal := subtotal
 	discountRate := 0.0
 	if subtotal.IsGreaterThan(50000) {
-		discountedSubtotal = subtotal.Multiply(0.85) // 15% discount
+		discountedSubtotal = subtotal.MultiplyByRate(85, 100) // 15% discount (multiply by 85/100)
 		discountRate = 0.15
 	} else if subtotal.IsGreaterThan(10000) {
-		discountedSubtotal = subtotal.Multiply(0.90) // 10% discount
+		discountedSubtotal = subtotal.MultiplyByRate(90, 100) // 10% discount (multiply by 90/100)
 		discountRate = 0.10
 	} else if subtotal.IsGreaterThan(7000) {
-		discountedSubtotal = subtotal.Multiply(0.93) // 7% discount
+		discountedSubtotal = subtotal.MultiplyByRate(93, 100) // 7% discount (multiply by 93/100)
 		discountRate = 0.07
 	} else if subtotal.IsGreaterThan(5000) {
-		discountedSubtotal = subtotal.Multiply(0.95) // 5% discount
+		discountedSubtotal = subtotal.MultiplyByRate(95, 100) // 5% discount (multiply by 95/100)
 		discountRate = 0.05
 	} else if subtotal.IsGreaterThan(1000) {
-		discountedSubtotal = subtotal.Multiply(0.97) // 3% discount
+		discountedSubtotal = subtotal.MultiplyByRate(97, 100) // 3% discount (multiply by 97/100)
 		discountRate = 0.03
 	}
 	
@@ -72,7 +74,10 @@ func calculateTotalDetailed(quantity int, price float64, state string, verbose b
 	taxRate, hasTax := taxRates[state]
 	var total Money
 	if hasTax {
-		tax := discountedSubtotal.Multiply(taxRate)
+		// Convert tax rate to fraction for integer arithmetic
+		// e.g., 6.85% = 685/10000
+		taxNumerator := int64(taxRate * 10000 + 0.5)
+		tax := discountedSubtotal.MultiplyByRate(taxNumerator, 10000)
 		total = discountedSubtotal.Add(tax)
 	} else {
 		total = discountedSubtotal
@@ -81,12 +86,14 @@ func calculateTotalDetailed(quantity int, price float64, state string, verbose b
 	if verbose {
 		fmt.Printf("Subtotal: $%.2f\n", subtotal.ToDollars())
 		if discountRate > 0 {
-			discount := subtotal.Multiply(discountRate)
+			discountNumerator := int64(discountRate * 100 + 0.5)
+			discount := subtotal.MultiplyByRate(discountNumerator, 100)
 			fmt.Printf("Discount (%.0f%%): -$%.2f\n", discountRate*100, discount.ToDollars())
 			fmt.Printf("After discount: $%.2f\n", discountedSubtotal.ToDollars())
 		}
 		if hasTax {
-			tax := discountedSubtotal.Multiply(taxRate)
+			taxNumerator := int64(taxRate * 10000 + 0.5)
+			tax := discountedSubtotal.MultiplyByRate(taxNumerator, 10000)
 			fmt.Printf("Tax (%.2f%%): $%.2f\n", taxRate*100, tax.ToDollars())
 		}
 		fmt.Printf("Total: $%.2f\n", total.ToDollars())
