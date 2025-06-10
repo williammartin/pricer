@@ -59,11 +59,11 @@ func TestCalculateTotal(t *testing.T) {
 			expected: 1295.56,
 		},
 		{
-			name:     "discount over $1000 without tax",
+			name:     "California tax calculation with discount",
 			quantity: 25,
 			price:    50.00,
 			state:    "CA",
-			expected: 1212.50,
+			expected: 1312.53,
 		},
 		{
 			name:     "Texas tax calculation with discount",

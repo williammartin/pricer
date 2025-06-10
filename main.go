@@ -50,6 +50,10 @@ func calculateTotal(quantity int, price float64, state string) float64 {
 		tax := discountedSubtotal.Multiply(0.0625)
 		total := discountedSubtotal.Add(tax)
 		return total.ToDollars()
+	} else if state == "CA" {
+		tax := discountedSubtotal.Multiply(0.0825)
+		total := discountedSubtotal.Add(tax)
+		return total.ToDollars()
 	}
 	
 	return discountedSubtotal.ToDollars()
