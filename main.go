@@ -105,9 +105,8 @@ func calculateTotalDetailed(quantity int, price float64, state string, verbose b
 	return total.ToDollars()
 }
 
-func main() {
+func run(args []string) int {
 	verbose := false
-	args := os.Args[1:]
 	
 	// Check for --verbose flag
 	for i, arg := range args {
@@ -120,29 +119,29 @@ func main() {
 	
 	if len(args) != 3 {
 		fmt.Fprintf(os.Stderr, "Usage: pricer <quantity> <price> <state> [--verbose]\n")
-		os.Exit(1)
+		return 1
 	}
 
 	quantity, err := strconv.Atoi(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Quantity must be a number\n")
-		os.Exit(1)
+		return 1
 	}
 	
 	if quantity < 0 {
 		fmt.Fprintf(os.Stderr, "Quantity cannot be negative\n")
-		os.Exit(1)
+		return 1
 	}
 
 	price, err := strconv.ParseFloat(args[1], 64)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Price must be a number\n")
-		os.Exit(1)
+		return 1
 	}
 	
 	if price < 0 {
 		fmt.Fprintf(os.Stderr, "Price cannot be negative\n")
-		os.Exit(1)
+		return 1
 	}
 
 	state := args[2]
@@ -156,11 +155,18 @@ func main() {
 	}
 	if !isSupported {
 		fmt.Fprintf(os.Stderr, "State code not supported. Supported states: UT, NV, TX, AL, CA\n")
-		os.Exit(1)
+		return 1
 	}
 	
 	total := calculateTotalDetailed(quantity, price, state, verbose)
 	if !verbose {
 		fmt.Printf("%.2f\n", total)
 	}
+	
+	return 0
+}
+
+func main() {
+	exitCode := run(os.Args[1:])
+	os.Exit(exitCode)
 }
